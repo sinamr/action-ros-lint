@@ -2,6 +2,17 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as path from "path";
 
+async function runAptGetUpdate(): Promise<number> {
+	return exec.exec(
+		"sudo",
+		[
+			"DEBIAN_FRONTEND=noninteractive",
+			"apt-get",
+			"update"
+		]
+	);
+}
+
 async function runAptGetInstall(packages: string[]): Promise<number> {
 	return exec.exec(
 		"sudo",
@@ -39,6 +50,7 @@ export async function run() {
 
 		await exec.exec("rosdep", ["update"]);
 
+		await runAptGetUpdate();
 		await runAptGetInstall([`ros-${rosDistribution}-ament-${linterToolDashes}`]);
 
 		const options = {
